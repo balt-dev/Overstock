@@ -43,3 +43,19 @@ function Controller:R_cursor_release(x, y)
 end
 
 function Node:right_click() end
+
+function UIElement:right_click()
+    if self.config.right_button and (not self.last_clicked or self.last_clicked + 0.1 < G.TIMERS.REAL) and self.states.visible and not self.under_overlay and not self.disable_button then
+        self.last_right_clicked = G.TIMERS.REAL
+
+        --Removes a layer from the overlay menu stack
+        G.FUNCS[self.config.right_button](self)
+        
+        play_sound('button', 1, 0.3)
+        G.ROOM.jiggle = G.ROOM.jiggle + 0.5
+        self.right_button_clicked = true
+    end
+    if self.config.button_UIE then
+        self.config.button_UIE:right_click()
+    end
+end

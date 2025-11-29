@@ -9,7 +9,7 @@ function create_inline_number_select(args)
   args.max = args.max or math.huge
   args.step = args.step or 1
   args.scale = args.scale or 1
-  args.default = args.default or args.current
+  args.default = args.default or args.current                   
   args.prefix = args.prefix or 'x'
   args.colour = args.colour or G.C.RED
   args.w = (args.w or 2.5) * args.scale
@@ -116,27 +116,36 @@ function G.UIDEF.overstock_overview()
       })}},
       {n=G.UIT.R, config = {minh=0.1}},
       {n=G.UIT.R, config = {align = "cm"}, nodes={{n = G.UIT.C, 
-        config = {align = "cm", r = 0.1, minw = 1.5, minh = 0.6, hover = true, colour = G.C.GREEN, shadow = true, focus_args = { type = 'none' }, button = "overstock_start_rerolling", ref_table = ref_table},
+        config = {align = "cm", r = 0.1, minw = 1.5, minh = 0.6, hover = true, colour = G.C.GREEN, shadow = true, focus_args = { type = 'none' }, func = "overstock_can_bulk_reroll", button = "overstock_start_rerolling", ref_table = ref_table},
 		nodes = {{n=G.UIT.T, config={text = localize('k_reroll'), scale = 0.5, colour = G.C.WHITE, shadow = true}}}
       }}},
     }}
   }})
 end
 
-function UIElement:right_click()
-    if self.config.right_button and (not self.last_clicked or self.last_clicked + 0.1 < G.TIMERS.REAL) and self.states.visible and not self.under_overlay and not self.disable_button then
-        self.last_right_clicked = G.TIMERS.REAL
+local function can_reroll_into(card_key)
+  local center = G.P_CENTERS[card_key]
+  if not center then return false end
+  if not center.unlocked then return false end
+  if G.GAME.banned_keys and G.GAME.banned_keys[card_key] then return false end
+  if center.no_appear_in_shop then return false end
+  return true
+end
 
-        --Removes a layer from the overlay menu stack
-        G.FUNCS[self.config.right_button](self)
-        
-        play_sound('button', 1, 0.3)
-        G.ROOM.jiggle = G.ROOM.jiggle + 0.5
-        self.right_button_clicked = true
-    end
-    if self.config.button_UIE then
-        self.config.button_UIE:right_click()
-    end
+function G.FUNCS.overstock_can_bulk_reroll(e)
+  local b = {config={}}
+  G.FUNCS.can_reroll(b)
+  if
+    (not b.config.button) or
+    (to_big(G.GAME.dollars) - to_big(G.GAME.current_round.reroll_cost)) <= to_big(e.config.ref_table.cutoff) or
+    (not can_reroll_into(e.config.ref_table.card_key))
+  then 
+    e.config.colour = G.C.UI.BACKGROUND_INACTIVE
+    e.config.button = nil
+  else
+    e.config.colour = G.C.GREEN
+    e.config.button = 'overstock_start_rerolling'
+  end
 end
 
 function G.FUNCS.open_overstock_menu(e)

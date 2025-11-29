@@ -9,5 +9,7 @@
 	"badge_text_colour": "FFFFFF",
 	"version": "1.0.0",
 	"priority": 0,
-	"dependencies": [],
+	"dependencies": [
+		"Talisman (>=2.6)",
+	],
 }
