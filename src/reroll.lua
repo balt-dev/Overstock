@@ -11,8 +11,25 @@ local function roll_event()
     G.CONTROLLER.locks.shop_reroll = false
     return true
   end
+  for _, card in ipairs(G.shop_jokers.cards) do
+    if card.config.center_key == OVERSTOCK.target_key then
+      G.E_MANAGER:add_event(Event({
+        trigger = 'after',
+        delay = 0.5,
+        func = function()
+          play_sound('holo1')
+          play_sound('timpani')
+          card:juice_up(1, 0.5)
+          return true
+        end
+      }))
+      G.GAME.overstock_rerolling = false
+      G.CONTROLLER.locks.shop_reroll = false
+      return true
+    end
+  end
   G.FUNCS.reroll_shop()
-  G.E_MANAGER:add_event(Event { trigger = 'after', delay = 0.1, func = roll_event, blocking = false, blockable = true })
+  G.E_MANAGER:add_event(Event { func = roll_event, blocking = false, blockable = true })
   return true
 end
 
@@ -21,5 +38,5 @@ function G.FUNCS.overstock_start_rerolling(e)
   G.FUNCS.exit_overlay_menu()
   OVERSTOCK.target_key = e.config.ref_table["card_key"]
   OVERSTOCK.money_cutoff = e.config.ref_table["cutoff"]
-  G.E_MANAGER:add_event(Event { trigger = 'after', delay = 0.1, func = roll_event, blocking = false, blockable = true })
+  G.E_MANAGER:add_event(Event { func = roll_event, blocking = false, blockable = true })
 end

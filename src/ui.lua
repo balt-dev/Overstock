@@ -129,6 +129,15 @@ local function can_reroll_into(card_key)
   if not center.unlocked then return false end
   if G.GAME.banned_keys and G.GAME.banned_keys[card_key] then return false end
   if center.no_appear_in_shop then return false end
+  if G.GAME.cry_banished_keys and G.GAME.cry_banished_keys[card_key] then return false end
+  if center.yes_pool_flag and (not G.GAME.pool_flags or not G.GAME.pool_flags[center.yes_pool_flag]) then return false end
+  if center.no_pool_flag and (G.GAME.pool_flags and G.GAME.pool_flags[center.no_pool_flag]) then return false end
+  if (({
+    Enhanced = true, Edition = true, Back = true, 
+    Spectral = G.GAME.spectral_rate <= 0 and not (G.GAME.selected_back.effect.center.key == "b_cry_equilibrium"),
+    Code = G.GAME.code_rate and (G.GAME.code_rate <= 0) and not (G.GAME.selected_back.effect.center.key == "b_cry_equilibrium"),
+    Voucher = not (G.GAME.selected_back.effect.center.key == "b_cry_equilibrium"),
+  })[center.set]) then return false end
   return true
 end
 

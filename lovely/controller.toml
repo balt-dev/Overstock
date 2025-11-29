@@ -4,6 +4,133 @@ priority = 0
 
 [[patches]]
 [patches.pattern]
+target = "engine/controller.lua"
+pattern = """
+    if self.L_cursor_queue then 
+        self:L_cursor_press(self.L_cursor_queue.x, self.L_cursor_queue.y)
+        self.L_cursor_queue = nil
+    end
+"""
+position = "after"
+payload = '''
+    if self.R_cursor_queue then 
+        self:R_cursor_press(self.R_cursor_queue.x, self.R_cursor_queue.y)
+        self.R_cursor_queue = nil
+    end
+'''
+match_indent = true
+times = 1
+
+[[patches]]
+[patches.pattern]
+target = "engine/controller.lua"
+pattern = """self.clicked = {target = nil, handled = true, prev_target = nil} --The node that was clicked this frame"""
+position = "after"
+payload = '''self.right_clicked = {target = nil, handled = true, prev_target = nil}'''
+match_indent = true
+overwrite = false
+
+[[patches]]
+[patches.pattern]
+target = "engine/controller.lua"
+pattern = """
+self.cursor_down = {T = {x=0, y=0}, target = nil, time = 0, handled = true}
+self.cursor_up = {T = {x=0, y=0}, target = nil, time = 0.1, handled = true}
+"""
+position = "after"
+payload = '''
+self.right_cursor_down = {T = {x=0, y=0}, target = nil, time = 0, handled = true}
+self.right_cursor_up = {T = {x=0, y=0}, target = nil, time = 0.1, handled = true}
+'''
+match_indent = true
+times = 1
+
+[[patches]]
+[patches.pattern]
+target = "engine/controller.lua"
+pattern = """function Controller:queue_R_cursor_press(x, y)"""
+position = "after"
+payload = '''self.R_cursor_queue = {x = x, y = y}'''
+match_indent = true
+times = 1
+
+[[patches]]
+[patches.pattern]
+target = "engine/node.lua"
+pattern = """click = {can = true, is = false},"""
+position = "after"
+payload = '''right_click = {can = true, is = false},'''
+match_indent = true
+times = 1
+
+[[patches]]
+[patches.pattern]
+target = "main.lua"
+pattern = '''function love.mousereleased(x, y, button)'''
+position = "after"
+payload = '''
+if button == 2 then G.CONTROLLER:R_cursor_release(x, y) end
+'''
+match_indent = true
+overwrite = false
+
+[[patches]]
+[patches.pattern]
+target = "main.lua"
+pattern = '''self.clicked.prev_target = self.clicked.target'''
+position = "after"
+payload = '''self.right_clicked.prev_target = self.right_clicked.target'''
+match_indent = true
+overwrite = false
+
+[[patches]]
+[patches.pattern]
+target = "engine/controller.lua"
+pattern = '''if not self.clicked.handled then
+    self.clicked.target:click()
+    self.clicked.handled = true
+end'''
+position = "after"
+payload = '''if not self.right_clicked.handled then
+    self.right_clicked.target:right_click()
+    self.right_clicked.handled = true
+end'''
+match_indent = true
+overwrite = false
+
+[[patches]]
+[patches.pattern]
+target = "engine/controller.lua"
+pattern = """--Cursor is currently hovering over something"""
+position = "before"
+payload = '''
+if not self.right_cursor_down.handled then 
+    if self.right_cursor_down.target.states.drag.can then
+        self.right_cursor_down.target.states.drag.is = true
+        self.right_cursor_down.target:set_offset(self.right_cursor_down.T, 'Click')
+    end
+    self.right_cursor_down.handled = true
+end
+
+if not self.right_cursor_up.handled then 
+    if self.right_cursor_down.target then 
+        if (not self.right_cursor_down.target.click_timeout or self.right_cursor_down.target.click_timeout*G.SPEEDFACTOR > self.right_cursor_up.time - self.right_cursor_down.time) then
+            if Vector_Dist(self.right_cursor_down.T, self.right_cursor_up.T) < G.MIN_CLICK_DIST then 
+                if self.right_cursor_down.target.states.right_click.can then
+                    self.right_clicked.target = self.right_cursor_down.target
+                    self.right_clicked.handled = false
+                end
+            end
+        end
+    end
+    self.right_cursor_up.handled = true
+end
+'''
+match_indent = true
+times = 1
+
+[[patches]]
+[patches.pattern]
 target = "functions/button_callbacks.lua"
 pattern = """
     G.CONTROLLER.locks.shop_reroll = false
