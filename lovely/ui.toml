@@ -1,0 +1,65 @@
+[manifest]
+version = "1.0.0"
+priority = 0
+
+[[patches]]
+[patches.pattern]
+target = "functions/UI_definitions.lua"
+pattern = """{n=G.UIT.R, config={align = "cm", maxw = 1.3, minw = 1}, nodes={
+            {n=G.UIT.T, config={text = localize('$'), scale = 0.7, colour = G.C.WHITE, shadow = true}},
+            {n=G.UIT.T, config={ref_table = G.GAME.current_round, ref_value = 'reroll_cost', scale = 0.75, colour = G.C.WHITE, shadow = true}},
+          }}"""
+position = "after"
+payload = ''', 
+          {n=G.UIT.R, config={align = "cm", maxw = 2, minw = 1}, nodes={
+            {n=G.UIT.T, config={text = localize "overstock_prompt_1", scale = 0.25, colour = G.C.WHITE, shadow = true}},
+          }},
+          {n=G.UIT.R, config={align = "cm", maxw = 2, minw = 1}, nodes={
+            {n=G.UIT.T, config={text = localize "overstock_prompt_2", scale = 0.25, colour = G.C.WHITE, shadow = true}},
+          }}
+'''
+match_indent = true
+times = 1
+
+[[patches]]
+[patches.pattern]
+target = "functions/UI_definitions.lua"
+pattern = """{n=G.UIT.R, config={align = "cm", minw = 2.8, minh = 1.6, r=0.15,colour = G.C.GREEN, button = 'reroll_shop', func = 'can_reroll', hover = true,shadow = true}, nodes = {"""
+position = "at"
+payload = '''{n=G.UIT.R, config={align = "cm", minw = 2.8, minh = 1.6, r=0.15,colour = G.C.GREEN, button = 'reroll_shop', right_button = 'open_overstock_menu', func = 'can_reroll', hover = true,shadow = true}, nodes = {'''
+match_indent = true
+times = 1
+
+[[patches]]
+[patches.pattern]
+target = "engine/ui.lua"
+pattern = """if self.config.button then self.states.collide.can = true; self.states.click.can = true end"""
+position = "after"
+payload = '''if self.config.right_button then self.states.right_click.can = true end'''
+match_indent = true
+times = 1
+
+[[patches]]
+[patches.pattern]
+target = "engine/ui.lua"
+pattern = """
+        if self.config.button and ((self.last_clicked and self.last_clicked > G.TIMERS.REAL - 0.1) or ((self.config.button and (self.states.hover.is or self.states.drag.is))
+            and G.CONTROLLER.is_cursor_down)) then
+                self.layered_parallax.x = self.layered_parallax.x - parallax_dist*self.shadow_parrallax.x/G.TILESIZE*(self.config.button_dist or 1)
+                self.layered_parallax.y = self.layered_parallax.y - parallax_dist*self.shadow_parrallax.y/G.TILESIZE*(self.config.button_dist or 1)
+                parallax_dist = 0
+                button_being_pressed = true
+        end
+"""
+position = "after"
+payload = '''
+        if self.config.right_button and ((self.last_clicked and self.last_clicked > G.TIMERS.REAL - 0.1) or ((self.config.right_button and (self.states.hover.is or self.states.drag.is))
+            and G.CONTROLLER.is_right_cursor_down)) then
+                self.layered_parallax.x = self.layered_parallax.x - parallax_dist*self.shadow_parrallax.x/G.TILESIZE*(self.config.button_dist or 1)
+                self.layered_parallax.y = self.layered_parallax.y - parallax_dist*self.shadow_parrallax.y/G.TILESIZE*(self.config.button_dist or 1)
+                parallax_dist = 0
+                button_being_pressed = true
+        end
+'''
+match_indent = true
+times = 1

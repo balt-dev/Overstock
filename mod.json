@@ -1,0 +1,13 @@
+{
+	"id": "overstock",
+	"name": "Overstock",
+	"author": ["baltdev"],
+	"description": "Adds a utility to reroll the shop until a card is found or a money threshold is hit.\nRight click the Reroll button to bring up the interface.",
+	"prefix": "overstock",
+	"main_file": "main.lua",
+	"badge_colour": "4BC292",
+	"badge_text_colour": "FFFFFF",
+	"version": "1.0.0",
+	"priority": 0,
+	"dependencies": [],
+}
