@@ -63,3 +63,22 @@ payload = '''
 '''
 match_indent = true
 times = 1
+
+[[patches]]
+[patches.pattern]
+target = "functions/UI_definitions.lua"
+pattern = """local t = create_UIBox_generic_options({ back_func = G.STAGE == G.STAGES.RUN and 'options' or 'exit_overlay_menu', contents = {"""
+position = "at"
+payload = '''
+local back_func
+if (love.timer.getTime() - OVERSTOCK.menu_last_open) < 0.1 then
+    back_func = "open_overstock_menu"
+elseif G.STAGE == G.STAGES.RUN then
+    back_func = 'options'
+else
+    back_func = 'exit_overlay_menu'
+end
+local t = create_UIBox_generic_options({ back_func = back_func, contents = {
+'''
+match_indent = true
+times = 1

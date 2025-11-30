@@ -6,6 +6,7 @@ return {
       k_overstock_enter_id = "j_joker",
       k_overstock_menu = "Overstock Menu",
       k_overstock_cutoff = "Money Cutoff",
+      overstock_rclick = "Shift + Right Click a card to copy its key to your clipboard",
     }
   }
 }

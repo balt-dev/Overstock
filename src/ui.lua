@@ -97,11 +97,17 @@ function create_inline_number_select(args)
   return t
 end
 
+OVERSTOCK.menu_last_open =  0
+
+function G.FUNCS.overstock_menu_is_open()
+  OVERSTOCK.menu_last_open = love.timer.getTime()
+end
+
 function G.UIDEF.overstock_overview()
   local ref_table = { card_key = "", cutoff = G.GAME.interest_cap }
   
   return create_UIBox_generic_options({ back_func = 'exit_overlay_menu', contents = {
-    {n=G.UIT.C, config={align = "cm", padding = 0.2, r = 0.2, colour = G.C.BLACK}, nodes={
+    {n=G.UIT.C, config={align = "cm", padding = 0.2, r = 0.2, colour = G.C.BLACK, func = "overstock_menu_is_open"}, nodes={
       {n=G.UIT.R, config={align = "cm"}, nodes={{n=G.UIT.T, config={text = localize("k_overstock_menu"), scale = 1, colour = G.C.UI.TEXT_DARK}}}},
       {n=G.UIT.R, config = {minh=0.5}},
       {n=G.UIT.R, config={align = "cm"}, nodes={{n=G.UIT.T, config={text = "Key of card:", scale = 0.45, colour = G.C.WHITE}}}},
@@ -114,6 +120,9 @@ function G.UIDEF.overstock_overview()
       {n=G.UIT.R, config={align = "cm"}, nodes={create_inline_number_select({
         w = 2, colour = G.C.MONEY, h = 0.5, ref_table = ref_table, ref_value = 'cutoff', prefix=localize'$', default = math.min(G.GAME.interest_cap, 50), step = 1, min = G.GAME.bankrupt_at
       })}},
+      {n=G.UIT.R, config = {minh=0.1}},
+      UIBox_button{ label = {localize('b_collection')}, button = "your_collection", minw = 4},
+      {n=G.UIT.R, config={align = "cm"}, nodes={{n=G.UIT.T, config={text = localize("overstock_rclick"), scale = 0.25, colour = G.C.UI.TEXT_DARK, shadow = false}}}},
       {n=G.UIT.R, config = {minh=0.1}},
       {n=G.UIT.R, config = {align = "cm"}, nodes={{n = G.UIT.C, 
         config = {align = "cm", r = 0.1, minw = 1.5, minh = 0.6, hover = true, colour = G.C.GREEN, shadow = true, focus_args = { type = 'none' }, func = "overstock_can_bulk_reroll", button = "overstock_start_rerolling", ref_table = ref_table},

@@ -104,11 +104,7 @@ target = "engine/controller.lua"
 pattern = """--Cursor is currently hovering over something"""
 position = "before"
 payload = '''
-if not self.right_cursor_down.handled then 
-    if self.right_cursor_down.target.states.drag.can then
-        self.right_cursor_down.target.states.drag.is = true
-        self.right_cursor_down.target:set_offset(self.right_cursor_down.T, 'Click')
-    end
+if not self.right_cursor_down.handled then
     self.right_cursor_down.handled = true
 end
 
