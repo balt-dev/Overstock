@@ -62,7 +62,7 @@ end
 
 function Card:right_click()
     if not (love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")) then return end
-    self:juice_up(0.5, 0.1)
+    self:juice_up(0.1, 0.1)
     love.system.setClipboardText(self.config.center_key)
     OVERSTOCK.show_popup("Copied to clipboard: " .. self.config.center_key)
 end
