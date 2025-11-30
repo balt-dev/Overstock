@@ -66,3 +66,16 @@ function Card:right_click()
     love.system.setClipboardText(self.config.center_key)
     OVERSTOCK.show_popup("Copied to clipboard: " .. self.config.center_key)
 end
+
+local Controller_key_press_update = Controller.key_press_update
+
+function Controller:key_press_update(key, dt)
+    if key == "v" and (love.keyboard.isDown "lctrl" or love.keyboard.isDown "rctrl") then
+        local string = love.system.getClipboardText()
+        for char in string:gmatch "." do
+            Controller_key_press_update(self, char, dt)
+        end
+        return
+    end
+    Controller_key_press_update(self, key, dt)
+end

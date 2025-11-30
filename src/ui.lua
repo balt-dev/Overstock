@@ -104,7 +104,7 @@ function G.FUNCS.overstock_menu_is_open()
 end
 
 function G.UIDEF.overstock_overview()
-  local ref_table = { card_key = "", cutoff = G.GAME.interest_cap }
+  local ref_table = { card_key = "", cutoff = math.min(G.GAME.interest_cap, G.GAME.dollars) }
   
   return create_UIBox_generic_options({ back_func = 'exit_overlay_menu', contents = {
     {n=G.UIT.C, config={align = "cm", padding = 0.2, r = 0.2, colour = G.C.BLACK, func = "overstock_menu_is_open"}, nodes={
@@ -118,7 +118,7 @@ function G.UIDEF.overstock_overview()
       {n=G.UIT.R, config = {minh=0.1}},
       {n=G.UIT.R, config={align = "cm"}, nodes={{n=G.UIT.T, config={text = localize("k_overstock_cutoff"), scale = 0.45, colour = G.C.WHITE}}}},
       {n=G.UIT.R, config={align = "cm"}, nodes={create_inline_number_select({
-        w = 2, colour = G.C.MONEY, h = 0.5, ref_table = ref_table, ref_value = 'cutoff', prefix=localize'$', default = math.min(G.GAME.interest_cap, 50), step = 1, min = G.GAME.bankrupt_at
+        w = 2, colour = G.C.MONEY, h = 0.5, ref_table = ref_table, ref_value = 'cutoff', prefix=localize'$', step = 1, min = G.GAME.bankrupt_at
       })}},
       {n=G.UIT.R, config = {minh=0.1}},
       UIBox_button{ label = {localize('b_collection')}, button = "your_collection", minw = 4},
